@@ -1,5 +1,12 @@
 {% extends "money/base.html" %}
 
 {% block content %}
-<h1>Upload</h1>
+<h1>Upload OFX File</h1>
+
+<form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="submit" value="Submit" />
+</form>
+
 {% endblock %}
