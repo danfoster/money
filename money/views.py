@@ -3,6 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from .forms import OFXUploadForm
 
+from ofxparse import OfxParser
+
 def index(request):
   template = loader.get_template('money/index.html')
   context = RequestContext(request, {
@@ -17,9 +19,12 @@ def upload(request):
       # check whether it's valid:
       if form.is_valid():
           # process the data in form.cleaned_data as required
+          ofx = OfxParser.parse(request.FILES['ofxfile'])
+          for account in ofx.accounts:
+            print account.number
           # ...
           # redirect to a new URL:
-          return render(request, 'money/upload_done.html', {'form': form})
+          return render(request, 'money/upload_done.html', {'output': ofx.account.number })
 
   # if a GET (or any other method) we'll create a blank form
   else:
