@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from .forms import OFXUploadForm
+from .forms import OFXUploadForm, AccountModifyForm
+from .models import Account
 
 from ofxparse import OfxParser
 
@@ -20,11 +21,23 @@ def upload(request):
       if form.is_valid():
           # process the data in form.cleaned_data as required
           ofx = OfxParser.parse(request.FILES['ofxfile'])
+
+          # Check that all account exist, if not create them.
+          newaccounts = []
           for account in ofx.accounts:
-            print account.number
-          # ...
-          # redirect to a new URL:
-          return render(request, 'money/upload_done.html', {'output': ofx.account.number })
+            if account.account_type == 'SAVINGS':
+              accounttype = 'SAV'
+            elif account.account_type == 'CHECKING':
+              accounttype = 'CUR'
+            else:
+              accounttype = 'CUR'
+            results = Account.objects.filter(account=account.number,sortcode=account.routing_number)
+            if len(results) == 0:
+              newaccount = Account(account=account.number,sortcode=account.routing_number,accounttype=accounttype)
+              accountform = AccountModifyForm(instance=newaccount)
+              newaccounts.append(accountform)
+              newaccount.save()
+          return render(request, 'money/upload_done.html', {'newaccounts': newaccounts })
 
   # if a GET (or any other method) we'll create a blank form
   else:

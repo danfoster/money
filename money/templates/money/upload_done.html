@@ -1,8 +1,40 @@
 {% extends "money/base.html" %}
 
 {% block content %}
-<h1>Upload OFX File</h1>
 
+{% if newaccounts %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">New Accounts Found</h3>
+  </div>
+  <div class="panel-body">
+    <p>New accounts have been found and automatically created. Finish configuring them here.
+    <div class="panel panel-success">
+    {% for account in newaccounts %}
+    <div class="panel-heading">
+      <h3 class="panel-title">{{account.sortcode.value}} - {{account.account.value}}</h3>
+    </div>
+    <div class="panel-body">
+      <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="input-group">
+          <span class="input-group-addon">{{account.name.label}}</span>
+          {{account.name}}
+        </div>
+        <div class="input-group">
+          <span class="input-group-addon">{{account.accounttype.label}}</span>
+          {{account.accounttype}}
+        </div>
+        <div class="input-group">
+          <span class="input-group-addon">{{account.currency.label}}</span>
+          {{account.currency}}
+        </div>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
 {{output}}
 
 {% endblock %}
