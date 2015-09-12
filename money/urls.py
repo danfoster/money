@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^upload/$', views.upload, name='upload'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/', include('moneyapi.urls')),
 ]
