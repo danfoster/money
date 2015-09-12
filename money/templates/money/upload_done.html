@@ -1,4 +1,5 @@
 {% extends "money/base.html" %}
+{% load staticfiles %}
 
 {% block content %}
 
@@ -14,9 +15,10 @@
     <div class="panel-heading">
       <h3 class="panel-title">{{account.sortcode.value}} - {{account.account.value}}</h3>
     </div>
-    <div class="panel-body">
-      <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+    <div class="panel-body" id="account-body-{{account.instance.id}}">
+      <form id="newaccount-{{account.instance.id}}" action="{{ request.path }}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        {{account.modelid}}
         <div class="input-group">
           <span class="input-group-addon">{{account.name.label}}</span>
           {{account.name}}
@@ -29,6 +31,7 @@
           <span class="input-group-addon">{{account.currency.label}}</span>
           {{account.currency}}
         </div>
+        <input type="submit" value="Save & Close"/>
       </form>
     </div>
     {% endfor %}
@@ -37,4 +40,19 @@
 {% endif %}
 {{output}}
 
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static "js/jquery.form.js"%}"></script>
+  <script src="{% static "js/upload.js"%}"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var options = {
+        beforeSubmit:  submitNewAccount,  // pre-submit callback
+      };
+      {% for account in newaccounts %}
+      $('#newaccount-{{account.instance.id}}').ajaxForm(options);
+      {% endfor %}
+    });
+  </script>
 {% endblock %}

@@ -33,9 +33,9 @@ def upload(request):
             results = Account.objects.filter(account=account.number,sortcode=account.routing_number)
             if len(results) == 0:
               newaccount = Account(account=account.number,sortcode=account.routing_number,accounttype=accounttype)
+              newaccount.save()
               accountform = AccountModifyForm(instance=newaccount)
               newaccounts.append(accountform)
-              newaccount.save()
           return render(request, 'money/upload_done.html', {'newaccounts': newaccounts })
 
   # if a GET (or any other method) we'll create a blank form
