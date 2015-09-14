@@ -7,7 +7,9 @@ from ofxparse import OfxParser
 
 def index(request):
   template = loader.get_template('money/index.html')
+  accounts = Account.objects.all()
   context = RequestContext(request, {
+    'accounts': accounts
   })
   return HttpResponse(template.render(context))
 
