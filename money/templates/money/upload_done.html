@@ -39,6 +39,28 @@
   </div>
 </div>
 {% endif %}
+<h2>Upload Complete</h2>
+
+{% if skippedtransactions %}
+<h3>Skipped Transactions</h3>
+The following transactions were already found and therefore skipped:
+<table>
+{% for trans in skippedtransactions %}
+<tr><td>{{trans}}</td></tr>
+{% endfor %}
+</table>
+{% endif %}
+
+{% if newtransactions %}
+<h3>New Transactions</h3>
+The following transactions were found and addd
+<table>
+{% for trans in newtransactions %}
+<tr><td>{{trans}}</td></tr>
+{% endfor %}
+</table>
+{% endif %}
+
 {{output}}
 
 {% endblock %}

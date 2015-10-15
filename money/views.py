@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from .forms import OFXUploadForm, AccountModifyForm
-from .models import Account
+from .models import Account, Transaction
 from ofxparse import OfxParser
 
 def index(request):
@@ -23,9 +23,12 @@ def upload(request):
           # process the data in form.cleaned_data as required
           ofx = OfxParser.parse(request.FILES['ofxfile'])
 
-          # Check that all account exist, if not create them.
+         
           newaccounts = []
+          newtransactions = []
+          skippedtransactions = []
           for account in ofx.accounts:
+            # Check that all account exist, if not create them.
             if account.account_type == 'SAVINGS':
               accounttype = 'SAV'
             elif account.account_type == 'CHECKING':
@@ -34,11 +37,29 @@ def upload(request):
               accounttype = 'CUR'
             results = Account.objects.filter(account=account.number,sortcode=account.routing_number)
             if len(results) == 0:
-              newaccount = Account(account=account.number,sortcode=account.routing_number,accounttype=accounttype)
-              newaccount.save()
-              accountform = AccountModifyForm(instance=newaccount)
+              # No existing account exists, lets create one
+              accountmodel = Account(account=account.number,sortcode=account.routing_number,accounttype=accounttype)
+              accountmodel.save()
+              accountform = AccountModifyForm(instance=accountmodel)
               newaccounts.append(accountform)
-          return render(request, 'money/upload_done.html', {'newaccounts': newaccounts })
+            else:
+              accountmodel = results[0]
+
+            #Load transactions.  
+            for transaction in account.statement.transactions:
+              results = Transaction.objects.filter(account=accountmodel,transid=transaction.id)
+              if len(results) == 0:
+                # No existing transaction exists, lets create one
+                transactionmodel = Transaction(account=accountmodel,memo=transaction.memo,payee=transaction.payee,amount=transaction.amount,transtype=transaction.type,transid=transaction.id)
+                transactionmodel.save()
+                newtransactions.append(transactionmodel)
+              else:
+                transactionmodel = results[0]
+                skippedtransactions.append(transactionmodel)
+            
+          return render(request, 'money/upload_done.html', {'newaccounts': newaccounts,
+                                                            'newtransactions': newtransactions,
+                                                            'skippedtransactions': skippedtransactions})
 
   # if a GET (or any other method) we'll create a blank form
   else:

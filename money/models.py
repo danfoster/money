@@ -21,7 +21,20 @@ class Account(models.Model):
   def __unicode__(self):
     return self.name + " " + self.sortcode + " - " + self.account
     
-
 class Transaction(models.Model):
   account = models.ForeignKey(Account)
+  memo = models.CharField(max_length=50,default='')
+  payee = models.CharField(max_length=50,default='')
+  amount = models.DecimalField(max_digits=10,decimal_places=2,default=0)
+  transtype = models.CharField(max_length=10,default='pos')
+  transid = models.BigIntegerField(default=0)
+
+  def __unicode__(self):
+    if self.memo is u'':
+      return self.payee
+    elif self.payee is u'':
+      return self.memo
+    else:
+      return self.payee + " - " + self.memo
+  
 
