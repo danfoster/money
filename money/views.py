@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from .forms import OFXUploadForm, AccountModifyForm
 
+from .models import Account
 from .utils import parseofx
 
 def index(request):

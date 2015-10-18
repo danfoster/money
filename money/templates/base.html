@@ -29,6 +29,14 @@
           <ul class="nav navbar-nav">
             {% url "upload" as upload_url %}
             <li class="{% if request.path == upload_url %} active {% endif %}"><a href="{{ upload_url }}">Upload</a></li>
+	    {% if user.is_authenticated %}
+	    # TODO: Find out how to customise get_username output
+	    # TODO: Align right and have a dropdown to logout.
+	      <li><a href="">{{ user.get_username }}</a></li>
+	    {% else %}
+	      {% url "login" as login_url %}
+	      <li class="{% if request.path == login_url %} active {% endif %}"><a href="{{ login_url }}">Login</a></li>
+	    {% endif %}
           </ul>
         </div><!--/.nav-collapse -->
       </div>
