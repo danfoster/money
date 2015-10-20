@@ -15,33 +15,39 @@
   </head>
   <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
+      <div class="container-fluid">
+	<div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{% url "index" %}"">Money</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            {% url "upload" as upload_url %}
-            <li class="{% if request.path == upload_url %} active {% endif %}"><a href="{{ upload_url }}">Upload</a></li>
+          <a class="navbar-brand" href="{% url "index" %}">Money</a>
+	</div>
+	<div id="navbar" class="collapse navbar-collapse">
+	  <ul class="nav navbar-nav">
+	    {% url "upload" as upload_url %}
+	    <li class="{% if request.path == upload_url %} active {% endif %}"><a href="{{ upload_url }}">Upload</a></li>
+	  </ul>
+          <ul class="nav navbar-nav navbar-right">
 	    {% if user.is_authenticated %}
-	    # TODO: Find out how to customise get_username output
-	    # TODO: Align right and have a dropdown to logout.
-	      <li><a href="">{{ user.get_username }}</a></li>
+	    <li class="dropdown">
+	      <a href="" class="dropdown-toggle" data-toggle="dropdown">{{ user.get_full_name }}</a>
+	      <ul class="dropdown-menu">
+		{% url "logout" as logout_url %}
+		<li><a href="{{ logout_url }}">Logout</a></li>
+	      </ul>
+	    </li>  
 	    {% else %}
-	      {% url "login" as login_url %}
-	      <li class="{% if request.path == login_url %} active {% endif %}"><a href="{{ login_url }}">Login</a></li>
+	    {% url "login" as login_url %}
+	    <li><a href="{{ login_url }}">Login</a></li>
 	    {% endif %}
-          </ul>
-        </div><!--/.nav-collapse -->
+	  </ul>
+	</div><!--/.nav-collapse -->
       </div>
     </nav>
-
+    
     <div class="container">
     {% block content %}{% endblock %}
     </div><!-- /.container -->
